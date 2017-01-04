@@ -1,0 +1,137 @@
+<!doctype html>
+<html data-framework="vue">
+<head>
+    <title>Todo</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="node_modules/materialize-css/dist/css/materialize.min.css">
+    <link rel="stylesheet" href="css/todo.css">
+</head>
+<body>
+<main class="todoapp container" v-cloak>
+    <header class="header">
+        <h1>Todo</h1>
+        <form class="row" id="new-todo" @submit.prevent="addTodo">
+            <div class="col s5">
+                <input id="newTodoName" autofocus autocomplete="off" placeholder="Task" v-model="newTodo">
+            </div>
+            <div class="input-field col s3">
+                <select v-model="newCategory" class="browser-default">
+                    <option v-for="category in categories">
+                        {{category}}
+                    </option>
+                </select>
+            </div>
+            <div class="col s1">
+                <input type="number" v-model="newDividend">
+            </div>
+            <div class="col s1">
+                <input type="number" v-model="newDivisor">
+            </div>
+            <div class="col s2">
+                <button type="submit" class="btn">New task</button>
+            </div>
+        </form>
+    </header>
+    <section class="main" v-show="todos.length">
+        <draggable id="todo-list" :list="todos">
+            <div class="todo" v-for="(todo, index) in todos" :class="{completed: todo.completed, editing: todo == editedTodo}">
+                <div class="view row" v-if="!editedTodo || todo !== editedTodo" :class="{'selected': todo.selected, 'has-skips': todo.skips > 0, 'skipped': todo.skipped}">
+                    <div class="col s8">
+                        <input type="checkbox" :id="'todo-completed-' + index" v-model="todo.completed">
+                        <label :for="'todo-completed-' + index">
+                            {{todo.title}}
+                        </label>
+                        <div class="chip right" v-if="todo.category">
+                            {{todo.category}}
+                        </div>
+                    </div>
+                    <div class="col s2">
+                        <span class="probability">
+                            {{(todo.dividend + todo.skips) / gcd( todo.dividend + todo.skips, todo.divisor + todo.skips )}} / {{(todo.divisor + todo.skips) / gcd( todo.dividend + todo.skips, todo.divisor + todo.skips )}}
+                        </span>
+                        <span class="skipcount orange-text" v-if="todo.skips > 0">
+                            +{{todo.skips}}
+                        </span>
+                    </div>
+                    <div class="action-buttons col s2">
+                        <button type="button" class="edit-button btn-flat" @click="editTodo(todo)">
+                            <i class="small material-icons">mode_edit</i>
+                        </button>
+                        <button type="button" class="delete-button btn-flat red-text" v-if="todo.completed" @click="removeTodo(todo)">
+                            <i class="small material-icons">delete</i>
+                        </button>
+                        <button type="button" class="play-button btn-flat blue-text" v-if="!todo.completed" @click="runFrom(index)">
+                            <i class="small material-icons">play_arrow</i>
+                        </button>
+                    </div>
+                </div>
+                <form class="edit" v-if="todo === editedTodo" @submit.prevent="doneEdit(todo)">
+                    <div class="row">
+                        <div class="col s5">
+                            <input type="text" v-model="todo.title" @keyup.esc="cancelEdit(todo)">
+                        </div>
+                        <div class="input-field col s3">
+                            <select v-model="todo.category" class="browser-default">
+                                <option v-for="category in categories">
+                                    {{category}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col s1">
+                            <input type="number" v-model="todo.dividend" @keyup.esc="cancelEdit(todo)">
+                        </div>
+                        <div class="col s1">
+                            <input type="number" v-model="todo.divisor" @keyup.esc="cancelEdit(todo)">
+                        </div>
+                        <div class="col s2">
+                            <button type="submit" class="btn">
+                                Done
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </draggable>
+    </section>
+    <footer>
+        <button type="button" class="btn" @click="exportTodos">
+            Export data
+        </button>
+        <button type="button" class="btn" @click="showImport = !showImport">
+            Import data
+        </button>
+        <button type="button" class="btn" @click="clearSkips">
+            Clear skip counts
+        </button>
+        <button id="clear-completed" class="btn" @click="removeCompleted" v-show="todos.length > remaining">
+            Clear completed
+        </button>
+        <div v-if="showImport">
+            <textarea class="materialize-textarea" v-model="importData"></textarea>
+            <button type="button" class="btn" @click="importTodos">
+                Import data
+            </button>
+        </div>
+    </footer>
+    <footer id="notask-info" class="blue-grey white-text" v-if="notasks">
+        No tasks for today!
+        <button type="button" class="right btn" @click="notasks=false">
+            ok
+        </button>
+    </footer>
+</main>
+<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script src="node_modules/materialize-css/dist/js/materialize.min.js"></script>
+<script src="node_modules/director/build/director.js"></script>
+<script src="node_modules/vue/dist/vue.js"></script>
+<script src="node_modules/vuedraggable/node_modules/sortablejs/Sortable.min.js"></script>
+<script src="node_modules/vuedraggable/dist/vuedraggable.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+<script src="js/routes.js"></script>
+</body>
+</html>
