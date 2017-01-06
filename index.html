@@ -97,6 +97,10 @@
             </div>
         </draggable>
     </section>
+    <div>
+        Probability of a taskless day: {{Math.round(tasklessProbability*100)}}%
+        (every {{Math.round(1/tasklessProbability)}} days)
+    </div>
     <footer>
         <button type="button" class="btn" @click="exportTodos">
             Export data

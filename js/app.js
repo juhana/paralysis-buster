@@ -55,6 +55,7 @@
             remaining: function() {
                 return filters.active( this.todos ).length;
             },
+
             allDone: {
                 get: function() {
                     return this.remaining === 0;
@@ -64,6 +65,16 @@
                         todo.completed = value;
                     } );
                 }
+            },
+
+            tasklessProbability: function() {
+                var prob = 1;
+
+                this.todos.forEach( function( todo ) {
+                    prob *= 1 - ( todo.dividend + todo.skips ) / ( todo.divisor + todo.skips );
+                });
+
+                return prob;
             }
         },
 
