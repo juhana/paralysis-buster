@@ -6,6 +6,10 @@ body {
     display: none;
 }
 
+footer {
+    margin-top: 1em;
+}
+
 .view label {
     color: #000;
 }

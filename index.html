@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="http://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="node_modules/materialize-css/dist/css/materialize.min.css">
     <link rel="stylesheet" href="css/todo.css">
+    <link rel="icon" href="checkmark.png">
 </head>
 <body>
 <main class="todoapp container" v-cloak>
@@ -98,7 +99,7 @@
         </draggable>
     </section>
     <div>
-        Probability of a taskless day: {{Math.round(tasklessProbability*100)}}%
+        Probability of a taskless day: {{(tasklessProbability*100).toFixed(1)}}%
         (every {{Math.round(1/tasklessProbability)}} days)
     </div>
     <footer>
