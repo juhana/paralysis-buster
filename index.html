@@ -57,6 +57,9 @@
                         <span class="skipcount orange-text" v-if="todo.skips > 0">
                             +{{todo.skips}}
                         </span>
+                        <div class="task-percentage">
+                            {{Math.round((todo.dividend + todo.skips) / (todo.divisor + todo.skips) * 100)||((todo.dividend + todo.skips) / (todo.divisor + todo.skips) * 100).toFixed(1)}}%
+                        </div>
                     </div>
                     <div class="action-buttons col s2">
                         <button type="button" class="edit-button btn-flat" @click="editTodo(todo)">

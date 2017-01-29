@@ -1,7 +1,6 @@
 /*global Vue, todoStorage */
 
 (function( exports ) {
-
     'use strict';
 
     var filters = {
@@ -173,7 +172,16 @@
             },
 
             runFrom: function( index ) {
-                var todo, rnd, selected = false;
+                var todo,
+                    rnd,
+                    selected = false,
+                    oldSelected = document.querySelectorAll( '.selected' );
+
+                if( oldSelected ) {
+                    oldSelected.forEach( function( old ) {
+                        old.classList.add( 'old' );
+                    } );
+                }
 
                 for( var i = index; i < this.todos.length; ++i ) {
                     todo = this.todos[ i ];
