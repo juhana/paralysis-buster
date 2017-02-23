@@ -90,7 +90,15 @@
                     return;
                 }
 
-                this.todos.push( {
+                // Add the new item to the end of all other items in the same
+                // category. We assume all items are grouped together.
+                for( var i = 0; i < this.todos.length; ++i ) {
+                    if( this.todos[i].category === this.newCategory && this.todos[ i + 1 ] && this.todos[ i + 1 ].category !== this.newCategory ) {
+                        break;
+                    }
+                }
+
+                this.todos.splice( i + 1, 0, {
                     title: value,
                     category: this.newCategory,
                     dividend: this.newDividend,
