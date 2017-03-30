@@ -122,6 +122,50 @@
                 todo.title = this.beforeEditCache;
             },
 
+            categoryProbability: function( category ) {
+                var prob = 1;
+
+                this.todos.slice( this.currentTask + 1 ).filter( (todo) => todo.category === category )
+                    .forEach( function( todo ) {
+                        prob *= 1 - ( todo.dividend + todo.skips ) / ( todo.divisor + todo.skips );
+                    });
+
+                return 1 - prob;
+            },
+
+            clearSkips: function() {
+                for( var i = 0; i < this.todos.length; ++i ) {
+                    this.todos[ i ].skips = 0;
+                }
+            },
+
+            cumulativeCategoryProbability: function( category ) {
+                var index = this.categories.indexOf( category );
+                var prob = 1;
+                var categoryProbability = this.categoryProbability;
+
+                this.categories.slice( 0, index ).forEach( function( category ) {
+                    prob *= 1 - categoryProbability( category );
+                });
+
+                prob *= categoryProbability( category );
+
+                return prob;
+            },
+
+            cumulativeProbability: function( index ) {
+                var prob = 1,
+                    todo = this.todos[ index ];
+
+                this.todos.slice( this.currentTask + 1, index ).forEach( function( todo ) {
+                    prob *= 1 - ( todo.dividend + todo.skips ) / ( todo.divisor + todo.skips );
+                });
+
+                prob *= ( todo.dividend + todo.skips ) / ( todo.divisor + todo.skips );
+
+                return prob;
+            },
+
             doneEdit: function( todo ) {
                 if( !this.editedTodo ) {
                     return;
@@ -137,12 +181,6 @@
             editTodo: function( todo ) {
                 this.beforeEditCache = todo.title;
                 this.editedTodo = todo;
-            },
-
-            clearSkips: function() {
-                for( var i = 0; i < this.todos.length; ++i ) {
-                    this.todos[ i ].skips = 0;
-                }
             },
 
             exportTodos: function() {
@@ -173,19 +211,6 @@
                 this.todos = JSON.parse( this.importData );
                 this.showImport = false;
                 this.$forceUpdate();
-            },
-
-            probabilityUntilNow: function( index ) {
-                var prob = 1,
-                    todo = this.todos[ index ];
-
-                this.todos.slice( this.currentTask + 1, index ).forEach( function( todo ) {
-                    prob *= 1 - ( todo.dividend + todo.skips ) / ( todo.divisor + todo.skips );
-                });
-
-                prob *= ( todo.dividend + todo.skips ) / ( todo.divisor + todo.skips );
-
-                return prob;
             },
 
             roundToPrecision: function( a ) {

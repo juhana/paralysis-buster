@@ -41,7 +41,7 @@
         <draggable id="todo-list" :list="todos">
             <div class="todo" v-for="(todo, index) in todos" :class="{completed: todo.completed, editing: todo == editedTodo}">
                 <div class="view row" v-if="!editedTodo || todo !== editedTodo" :class="{'selected': todo.selected, 'has-skips': todo.skips > 0, 'skipped': todo.skipped}">
-                    <div class="col s8">
+                    <div class="col s7">
                         <input type="checkbox" :id="'todo-completed-' + index" v-model="todo.completed">
                         <label :for="'todo-completed-' + index">
                             {{todo.title}}
@@ -60,7 +60,7 @@
                         <div class="task-percentage">
                             {{Math.round((todo.dividend + todo.skips) / (todo.divisor + todo.skips) * 100)||((todo.dividend + todo.skips) / (todo.divisor + todo.skips) * 100).toFixed(1)}}%
                             <span v-if="index > currentTask + 1">
-                                / {{roundToPrecision( probabilityUntilNow( index ) * 100 )}}%
+                                / {{roundToPrecision( cumulativeProbability( index ) * 100 )}}%
                             </span>
                         </div>
                     </div>
@@ -74,6 +74,11 @@
                         <button type="button" class="play-button btn-flat blue-text" v-if="!todo.completed" @click="runFrom(index)">
                             <i class="small material-icons">play_arrow</i>
                         </button>
+                    </div>
+                    <div class="col s1" v-if="index === 0 || todo.category !== todos[index-1].category">
+                        {{roundToPrecision( categoryProbability( todo.category ) * 100 )}}%
+                        /
+                        {{roundToPrecision( cumulativeCategoryProbability( todo.category ) * 100 )}}%
                     </div>
                 </div>
                 <form class="edit" v-if="todo === editedTodo" @submit.prevent="doneEdit(todo)">
