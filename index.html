@@ -59,6 +59,9 @@
                         </span>
                         <div class="task-percentage">
                             {{Math.round((todo.dividend + todo.skips) / (todo.divisor + todo.skips) * 100)||((todo.dividend + todo.skips) / (todo.divisor + todo.skips) * 100).toFixed(1)}}%
+                            <span v-if="index > currentTask + 1">
+                                / {{roundToPrecision( probabilityUntilNow( index ) * 100 )}}%
+                            </span>
                         </div>
                     </div>
                     <div class="action-buttons col s2">
@@ -102,8 +105,8 @@
         </draggable>
     </section>
     <div>
-        Probability of a taskless day: {{(tasklessProbability*100).toFixed(1)}}%
-        (every {{Math.round(1/tasklessProbability)}} days)
+        Probability of a taskless day: {{roundToPrecision(tasklessProbability*100)}}%
+        (every {{nextTasklessDay}} days)
     </div>
     <footer>
         <button type="button" class="btn" @click="exportTodos">

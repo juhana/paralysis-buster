@@ -27,6 +27,7 @@
         // app initial state
         data: {
             todos: todoStorage.fetch(),
+            currentTask: -1,
             newTodo: '',
             newDividend: 1,
             newDivisor: 7,
@@ -51,10 +52,6 @@
         // computed properties
         // http://vuejs.org/guide/computed.html
         computed: {
-            remaining: function() {
-                return filters.active( this.todos ).length;
-            },
-
             allDone: {
                 get: function() {
                     return this.remaining === 0;
@@ -64,6 +61,14 @@
                         todo.completed = value;
                     } );
                 }
+            },
+
+            nextTasklessDay: function() {
+                return Math.round( 1 / this.tasklessProbability );
+            },
+
+            remaining: function() {
+                return filters.active( this.todos ).length;
             },
 
             tasklessProbability: function() {
@@ -170,6 +175,33 @@
                 this.$forceUpdate();
             },
 
+            probabilityUntilNow: function( index ) {
+                var prob = 1,
+                    todo = this.todos[ index ];
+
+                this.todos.slice( this.currentTask + 1, index ).forEach( function( todo ) {
+                    prob *= 1 - ( todo.dividend + todo.skips ) / ( todo.divisor + todo.skips );
+                });
+
+                prob *= ( todo.dividend + todo.skips ) / ( todo.divisor + todo.skips );
+
+                return prob;
+            },
+
+            roundToPrecision: function( a ) {
+                var n = 1;
+
+                if( a >= 1 || a <= 0 ) {
+                    return Math.round( a );
+                }
+
+                while( a.toFixed( n ).slice( -1 ) === "0" && n < 5 ) {
+                    n++;
+                }
+
+                return a.toFixed( n );
+            },
+
             removeCompleted: function() {
                 this.todos = filters.active( this.todos );
             },
@@ -199,6 +231,7 @@
                         todo.selected = true;
                         todo.skips = 0;
                         selected = true;
+                        this.currentTask = i;
                         break;
                     }
                     else {
