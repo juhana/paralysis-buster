@@ -111,7 +111,9 @@
     </section>
     <div>
         Probability of a taskless day: {{roundToPrecision(tasklessProbability*100)}}%
-        (every {{nextTasklessDay}} days)
+        <span v-if="nextTasklessDay <= 700">(every {{nextTasklessDay}} days)</span>
+        <span v-if="nextTasklessDay > 700">(every {{Math.round(nextTasklessDay/365)}} years)</span>
+
     </div>
     <footer>
         <button type="button" class="btn" @click="exportTodos">
